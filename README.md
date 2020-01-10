@@ -1,5 +1,13 @@
 # Factor functions
 
-1. Quantile sort stocks
-2. 
+## Main_funcs.py
 
+- Quantile sort stocks
+- exposure
+
+
+
+## df_preview.py
+
+- check_dup
+- check_col
