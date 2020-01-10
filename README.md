@@ -1,2 +1,5 @@
-# Factor_funcs
-Test Factors including several measurements
+# Factor functions
+
+1. Quantile sort stocks
+2. 
+
