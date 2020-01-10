@@ -26,6 +26,7 @@ from matplotlib import rcParams, cycler
 import matplotlib as mpl
 import matplotlib.dates as mdate
 from df_preview import *
+from quantile_character import *
 
 warnings.filterwarnings("ignore")
 
@@ -193,47 +194,7 @@ def quantile_profile_3(trade_interval, group_num,df_factor_loading,df_close_x,df
     df_all = df_all.sort_index()
     return df_all
 
-def factor_exposure_value(df1,df_mkt_size,group_num,w_plot):
-    df1 = date_strp_col(df1)
-    df_mkt_size = date_strp_col(df_mkt_size)
-    df1,df_mkt_size = inx_col_intersec(df1,df_mkt_size)
-    df_mkt_tile = df_mkt_size.rank(method='average', na_option='keep', ascending=True, pct=True).copy(deep=True)
-    group_name_list = ['TOP'] + ['G{0}'.format(order_number + 2) for order_number in range(group_num - 2)] + ['BOTTOM']
-    re_all = []
-    for day in df1.columns:
-        df_concat = df1[[day]].copy(deep=True)
-        df_concat.columns = ["factor_value"]
-        df_concat.dropna(inplace=True)
-        df_concat.sort_values(by='factor_value', ascending=True,inplace=True) # top 组合因子值小，bottom组合因子值大
-        group_stock_num = int(len(df_concat) / group_num)
-        re_daily = []
-        for iGroup in range(len(group_name_list)):
-            start_index = iGroup * group_stock_num
-            end_index = (iGroup + 1) * group_stock_num                    
-            if iGroup == len(group_name_list) - 1:
-                end_index = len(df_concat)
-            group_stocks = df_concat.iloc[start_index:end_index].index
-            re = df_mkt_tile[[day]].loc[group_stocks].mean().values[0]
-            re_daily.append(re)
-        re_all.append([day] + re_daily)
-    df_re_all = pd.DataFrame(re_all)
-    df_re_all = df_re_all.set_index(0)
-    df_re_all.columns = group_name_list
-    df_re_all = df_re_all.sort_index()
 
-    if w_plot==1:
-        plt.figure(figsize=(24,5))
-        ax = plt.subplot(121)
-        ax.plot(df_re_all[['TOP']],color='darkblue')
-        ax.plot(df_re_all[['BOTTOM']],color='darkred')
-        ax.legend(['TOP','BOTTOM'],loc=2)
-
-        ax2 = plt.subplot(122)
-        cmap = plt.cm.coolwarm
-        ax2.set_prop_cycle(cycler(color=cmap(np.linspace(0, 1, len(df_re_all.columns)))))
-        ax2.plot(df_re_all)
-        ax2.legend(df_re_all.columns,bbox_to_anchor=(1.01, 0), loc=3, borderaxespad=0,ncol=2)
-    return None
 
 def quntile_cumprod(df_q,w_plot):
     start_date = df_q.index[0] - (df_q.index[1] - df_q.index[0])
@@ -382,7 +343,6 @@ def neu_reg_fast(df1,df_nature_sec,df_mkt_size):
     dfre = pd.DataFrame(allv,columns=["v","index","DATE"])
     return dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
 
-
 def value_reg_fast(df1,df_mkt_size):
     df1,df_mkt_size = inx_col_intersec(df1,df_mkt_size)
     df1 = scale_df(df1)
@@ -451,23 +411,22 @@ def dummy_reg_fast(df1,df_nature_sec):
     dfre = pd.DataFrame(allv,columns=["v","index","DATE"])
     return dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
 
-def factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,weather_plot,weather_plot_2,intv):
+def factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,w_plot_2,intv):
 
     df1_neu = df1_neu.drop(df1_neu.count()[df1_neu.count()<group_number].index,axis=1)
-
     df1_neu = df1_neu.dropna(how='all',axis=1)
     df1_neu = date_strp_col(df1_neu)
     df_close_loading = date_strp_col(df_close_loading)
     df1_neu,df_close_loading = inx_col_intersec(df1_neu,df_close_loading)
 
-    df_ic = mining_corr(df1_neu,df_close_loading,weather_plot,weather_plot_2,intv)  
+    df_ic = mining_corr(df1_neu,df_close_loading,w_plot,w_plot_2,intv)  
     result_corr = corr_analysis(df_ic[["rank ic"]].values.flatten()) + corr_analysis(df_ic[["ic"]].values.flatten())
 
-    if weather_plot==0:
+    if w_plot==0:
         return result_corr,df_ic
     else:
         x1 = quantile_profile_3(intv,group_number,df1_neu,df_close_loading,df_weight)
-        pingjia_list = result_corr + quntile_cumprod(x1,weather_plot)
+        pingjia_list = result_corr + quntile_cumprod(x1,w_plot)
         plt.figure(figsize=(40,4))
         count=1
         for j in [20,60,120,240]:
@@ -544,35 +503,4 @@ def transition_matrix(df,group_num,intv):
     sns.heatmap(df_re)
     return df_re
 
-def qtile_character(df_fac,df_value,group_number,w_plot):
-    re3 = []
-    for i in df_fac.columns:
-        if i in df_value.columns:
-            t = df_fac[[i]].dropna().join(df_value[[i]],how='left',rsuffix='_right').dropna()
-            t.columns = ["fac","mkt"]
-            t = t.sort_values("fac")
-            group_stock_num = int(len(t) / group_number)
-            yushu = len(t)%group_number
-            group_stock_num_list = [group_stock_num+1]*yushu + [group_stock_num]*(group_number - yushu)
-            idxs = np.array(group_stock_num_list).cumsum() 
-            re2 = []
-            for iGroup in range(group_number):
-                if iGroup==0:
-                    start_index = 0
-                else:
-                    start_index = idxs[iGroup-1]
-                end_index = idxs[iGroup]
-                re1 = t["mkt"].iloc[start_index:end_index].mean()
-                re2.append(re1)
-            re3.append(re2)
-    if w_plot==1:
-        x = pd.DataFrame(re3).mean()
-        plt.grid(linestyle="-.",axis='y')
-        plt.bar(x.index,x)
-        plt.ylim(x.min()*0.99,x.max()*1.01)
-        ax1=plt.gca()
-        for j in ['left','right','top']:
-            ax1.spines[j].set_visible(False) 
-        plt.show()
-    return pd.DataFrame(re3).mean()
 
