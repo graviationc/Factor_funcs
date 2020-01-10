@@ -1,4 +1,3 @@
-
 def check_dup_rows(x):
     print(len(x))
     x1 = x.copy(deep=True)
