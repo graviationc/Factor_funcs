@@ -193,7 +193,7 @@ def quantile_profile_3(trade_interval, group_num,df_factor_loading,df_close_x,df
     df_all = df_all.sort_index()
     return df_all
 
-def factor_exposure_mkt(df1,df_mkt_size,group_num,w_plot):
+def factor_exposure_value(df1,df_mkt_size,group_num,w_plot):
     df1 = date_strp_col(df1)
     df_mkt_size = date_strp_col(df_mkt_size)
     df1,df_mkt_size = inx_col_intersec(df1,df_mkt_size)
