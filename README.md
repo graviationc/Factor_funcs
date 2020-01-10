@@ -14,19 +14,19 @@
 >
 > qtile_character(df_fac,df_value,group_number,w_plot)
 
-```python
-factor_exposure_value(df,df_value,group_num,w_plot)
 
-neu_reg_fast(df1,df_nature_sec,df_value)
+- factor_exposure_value(df,df_value,group_num,w_plot)
 
-value_reg_fast(df1,df_value)
+- neu_reg_fast(df1,df_nature_sec,df_value)
 
-dummy_reg_fast(df1,df_nature_sec)
+- value_reg_fast(df1,df_value)
 
-factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,w_plot_2,intv)
+- dummy_reg_fast(df1,df_nature_sec)
 
-qtile_character(df_fac,df_value,group_number,w_plot)
-```
+- factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,w_plot_2,intv)
+
+- qtile_character(df_fac,df_value,group_number,w_plot)
+
 
 ## df_preview.py
 
