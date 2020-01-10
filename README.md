@@ -9,5 +9,9 @@
 
 ## df_preview.py
 
-- check_dup
-- check_col
+- check_dup_rows(df)
+- check_col(df,column_name)
+
+## funcs_history.py
+
+- collect out-of-date functions

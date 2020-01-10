@@ -1,5 +1,5 @@
 
-def check_dup(x):
+def check_dup_rows(x):
     print(len(x))
     x1 = x.copy(deep=True)
     print(len(x.drop_duplicates()))
