@@ -1,62 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
-
-import pandas as pd
-import numpy as np
-import matplotlib.pylab as plt
-from scipy.interpolate import interp1d
-from datetime import datetime
-from pandas.plotting import register_matplotlib_converters
-import seaborn as sns
-from scipy.stats import spearmanr,skew,kurtosis,pearsonr
-import matplotlib 
-import warnings
-from sklearn.preprocessing import scale
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import StandardScaler
-from scipy.stats.mstats import winsorize
-from scipy.stats import ttest_ind
-from itertools import combinations
-from datetime import datetime  
-import time
-import itertools
-from scipy import stats
-from matplotlib.lines import Line2D
-from matplotlib import rcParams, cycler
-import matplotlib as mpl
-import matplotlib.dates as mdate
-from df_preview import *
+from Base_pkgs import *
 from quantile_character import *
-
-warnings.filterwarnings("ignore")
-
-def date_strp_col(df):
-    df.columns = [pd.to_datetime(str(i)) for i in df.columns.values]
-    df = df.T.sort_index().T
-    return df
-def list_to_color(listx):
-    re = []
-    for i in listx:
-        if i>=0:
-            re.append("darkred")
-        else:
-            re.append("darkgreen")
-    return re
-def time_value():
-    return time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())
-
-    
-def inx_col_intersec(df1_neu,df_close_loading):
-    df_close_loading = date_strp_col(df_close_loading)
-    df1_neu = date_strp_col(df1_neu)
-    col_ = list(set(df1_neu.columns)&set(df_close_loading.columns))
-    col_.sort()
-    df1_neu = df1_neu[col_]
-    df_close_loading = df_close_loading[col_]
-    bingji = set(df1_neu.index.values)&set(df_close_loading.index.values)
-    df1_neu = df1_neu.loc[bingji]
-    df_close_loading = df_close_loading.loc[bingji]
-    return df1_neu,df_close_loading
 
 def half_life(df_fac,df_stk_adjclose_pivot,weather_plot,intv):
     df_fac,df_stk_adjclose_pivot = inx_col_intersec(df_fac,df_stk_adjclose_pivot)
@@ -171,17 +114,11 @@ def quantile_profile_3(trade_interval, group_num,df_factor_loading,df_close_x,df
             df_concat = df_concat.join(df_weight[next_trade_day_list[0]],how='left',rsuffix="weight")
             df_concat = df_concat.replace(np.nan,0)
             df_concat.sort_values(by='factor_value', ascending=True,inplace=True) # top 组合因子值小，bottom组合因子值大
-            group_stock_num = int(len(df_concat) / group_num)
-            yushu = len(df_concat)%group_num
-            group_stock_num_list = [group_stock_num+1]*yushu + [group_stock_num]*(group_num - yushu)
-            idxs = np.array(group_stock_num_list).cumsum()     
+            idxs = trench_array(len(df_concat), group_num)
 
             for iGroup in range(len(group_name_list)):
-                if iGroup==0:
-                    start_index = 0
-                else:
-                    start_index = idxs[iGroup-1]
-                end_index = idxs[iGroup]
+                start_index = idxs[iGroup]
+                end_index = idxs[iGroup+1]
                 wei = [[i]*trade_interval for i in df_concat.iloc[start_index:end_index,-1].values]
                 v1 = df_concat.iloc[start_index:end_index,1:-1].copy(deep=True)
                 quantile_return_list[iGroup] += list(np.average(v1,weights=wei,axis=0))
@@ -297,9 +234,6 @@ def quntile_cumprod(df_q,w_plot):
 
         plt.show()
     return [pow(ls_value[-1],1/yyrs)-1,maxdd] + q_rtn
-        
-def scale_df(df1):
-    return pd.DataFrame(scale(df1),index = df1.index,columns = df1.columns)
 
 
 def neu_reg_fast(df1,df_nature_sec,df_mkt_size):
