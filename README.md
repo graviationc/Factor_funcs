@@ -11,7 +11,8 @@
 - quantile_character_value(df_fac,df_value,group_number,w_plot)
 - quantile_portfolio(df_fac,df_close,df_value,gp_num_1,gp_num_2,w_plot)
 
-##Base_pkgs.py
+## Base_pkgs.py
+
 - date_strp_col(df)
 - check_dup_rows(df)
 - check_col(df,column_name)
