@@ -7,7 +7,7 @@
 - dummy_reg_fast(df1,df_nature_sec)
 - factor_quantile_test(df_fac,df_close,df_weight=0,group_number=20,w_plot=1,w_plot_2=0,intv=20)
 
-## quantile_character.py
+## Trench_character.py
 - quantile_character_value(df_fac,df_value,group_number,w_plot)
 - quantile_portfolio(df_fac,df_close,df_value,gp_num_1,gp_num_2,w_plot)
 

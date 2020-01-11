@@ -29,10 +29,12 @@ import random
 
 warnings.filterwarnings("ignore")
 
+
 def date_strp_col(df):
     df.columns = [pd.to_datetime(str(i)) for i in df.columns.values]
     df = df.T.sort_index().T
     return df
+
 
 def check_dup_rows(x):
     print(len(x))
@@ -40,8 +42,10 @@ def check_dup_rows(x):
     print(len(x.drop_duplicates()))
     return None
 
+
 def check_col(df,s):
     return len(set(df[s].values))
+
 
 def list_to_color(listx):
     re = []
@@ -52,11 +56,14 @@ def list_to_color(listx):
             re.append("darkgreen")
     return re
 
+
 def time_value():
     return time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())
 
+
 def scale_df(df1):
     return pd.DataFrame(scale(df1),index = df1.index,columns = df1.columns)
+
 
 def inx_col_intersec(df1_neu,df_close_loading):
     df_close_loading = date_strp_col(df_close_loading)

@@ -1,5 +1,6 @@
 from Base_pkgs import *
-from quantile_character import *
+from Trench_character import *
+
 
 def half_life(df_fac,df_stk_adjclose_pivot,weather_plot,intv):
     df_fac,df_stk_adjclose_pivot = inx_col_intersec(df_fac,df_stk_adjclose_pivot)
@@ -12,19 +13,21 @@ def half_life(df_fac,df_stk_adjclose_pivot,weather_plot,intv):
             x = intv + j
             df_rtn = df_stk_adjclose_pivot.pct_change(intv,axis=1).shift(-x,axis=1).copy(deep=True)
             df_icall[j] = df_fac.iloc[:,::2].corrwith(df_rtn.iloc[:,::2],method=med)
-        if med=="spearman":
+        if med == "spearman":
             df["Rank IC"] = df_icall.mean()
-        if med=="pearson":
+        if med == "pearson":
             df["IC"] = df_icall.mean()
-    #df.plot.area(stacked=False,alpha = 0.5)
+    # df.plot.area(stacked=False,alpha = 0.5)
     plt.plot(df["Rank IC"],label="Rank IC",color='r')
     plt.plot(df["IC"],label="IC",color='g')
     return None
+
 
 def bar_rolling_plot(df,sp_1,sp_2):
     plt.bar(df.index,df[sp_1],color=list_to_color(df[sp_1].values),width=6,alpha=0.5,label=sp_1) #,width=12
     plt.plot(df.index,df[sp_2],linewidth=4,label=sp_2,c="b")
     return None
+
 
 def mining_corr(df_factor_loading,df_close_x,weather_plot,weather_plot_2,intv):
     spr_corr_all_stocks = []
