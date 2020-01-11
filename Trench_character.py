@@ -12,8 +12,8 @@ def trench_array(list_num, num_gps):
     return np.array(x).cumsum()
 
 def quantile_character_value(df_fac,df_value,group_number,w_plot):
-
     re3 = []
+    re5 = []
     for i in df_fac.columns:
         if i in df_value.columns:
             t = df_fac[[i]].join(df_value[[i]],how='left',rsuffix='_right').copy(deep=True).dropna()
@@ -22,23 +22,32 @@ def quantile_character_value(df_fac,df_value,group_number,w_plot):
                 t = t.sort_values("fac")
                 idxs = trench_array(len(t),group_number)
                 re2 = []
+                re4 = []
                 for iGroup in range(group_number):
                     start_index = idxs[iGroup]
                     end_index = idxs[iGroup+1]
                     re1 = t["VALUE_1"].iloc[start_index:end_index].mean()
+                    obsv = end_index - start_index
                     re2.append(re1)
+                    re4.append(obsv)
                 re3.append(re2)
+                re5.append(re4)
     if w_plot==1:
         x = pd.DataFrame(re3).mean()
         plt.grid(linestyle="-.",axis='y',zorder=0)
-        plt.bar(x.index,x,zorder=3)
-        plt.ylim(x.min()*0.99,x.max()*1.01)
+        plt.bar(list(np.array(list(x.index))+1),x,zorder=3)
+        if x.min()>0:
+            plt.ylim(x.min()*0.99,x.max()*1.01)
+        if x.max()<0:
+            plt.ylim(x.min()*1.01,x.max()*0.99)
+        else:
+            plt.ylim(x.min()*1.01,x.max()*1.01)
         ax1=plt.gca()
         for j in ['left','right','top']:
             ax1.spines[j].set_visible(False) 
         plt.show()
-    return pd.DataFrame(re3).mean()
-
+    return pd.DataFrame(re3).mean()#,pd.DataFrame(re5).sum()
+    
 def quantile_portfolio(df_fac,df_close,df_value,gps1,gps2,intv,w_plot):
     col_drop = df_fac.count()[df_fac.count()<group_number].index
     if len(col_drop)>0:
