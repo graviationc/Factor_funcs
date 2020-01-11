@@ -5,7 +5,7 @@
 - neu_reg_fast(df1,df_nature_sec,df_value)
 - value_reg_fast(df1,df_value)
 - dummy_reg_fast(df1,df_nature_sec)
-- factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,w_plot_2,intv)
+- factor_quantile_test(df_fac,df_close,df_weight=0,group_number=20,w_plot=1,w_plot_2=0,intv=20)
 
 ## quantile_character.py
 - quantile_character_value(df_fac,df_value,group_number,w_plot)

@@ -345,14 +345,14 @@ def dummy_reg_fast(df1,df_nature_sec):
     dfre = pd.DataFrame(allv,columns=["v","index","DATE"])
     return dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
 
-def factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,w_plot_2,intv):
 
-    df1_neu = df1_neu.drop(df1_neu.count()[df1_neu.count()<group_number].index,axis=1)
-    df1_neu = df1_neu.dropna(how='all',axis=1)
-    df1_neu = date_strp_col(df1_neu)
-    df_close_loading = date_strp_col(df_close_loading)
+def factor_quantile_test(df1_neu, df_close_loading, df_weight, group_number, w_plot, w_plot_2, intv):
+    col_drop = df1_neu.count()[df1_neu.count()<group_number].index
+    if len(col_drop)>0:
+        print(len(col_drop))
+        df1_neu = df1_neu.drop(col_drop,axis=1)
+
     df1_neu,df_close_loading = inx_col_intersec(df1_neu,df_close_loading)
-
     df_ic = mining_corr(df1_neu,df_close_loading,w_plot,w_plot_2,intv)  
     result_corr = corr_analysis(df_ic[["rank ic"]].values.flatten()) + corr_analysis(df_ic[["ic"]].values.flatten())
 
@@ -361,12 +361,13 @@ def factor_quantile_test(df1_neu,df_close_loading,df_weight,group_number,w_plot,
     else:
         x1 = quantile_profile_3(intv,group_number,df1_neu,df_close_loading,df_weight)
         pingjia_list = result_corr + quntile_cumprod(x1,w_plot)
-        plt.figure(figsize=(40,4))
-        count=1
-        for j in [20,60,120,240]:
-            plt.subplot(1,4,count)
-            transition_matrix(df1_neu,group_number,j)
-            count+=1
+        if w_plot_2==1:
+            plt.figure(figsize=(40,4))
+            count=1
+            for j in [20,60,120,240]:
+                plt.subplot(1,4,count)
+                transition_matrix(df1_neu,group_number,j)
+                count+=1
         return pingjia_list,df_ic
 
 
