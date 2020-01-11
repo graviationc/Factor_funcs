@@ -25,7 +25,6 @@ from matplotlib.lines import Line2D
 from matplotlib import rcParams, cycler
 import matplotlib as mpl
 import matplotlib.dates as mdate
-from df_preview import *
 import random
 
 warnings.filterwarnings("ignore")

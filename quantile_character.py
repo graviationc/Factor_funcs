@@ -49,7 +49,7 @@ def quantile_portfolio(df_fac,df_close,df_value,gps1,gps2,intv,w_plot):
     re3 = []
     for i in df_fac.columns[::intv][:-1]:
         t = df_fac[[i]].dropna().join(df_value[[i]],how='left',rsuffix='_VALUE').dropna().copy(deep=True)
-        t = t.join(df_rtn[[i]],how='left',rsuffix='_RTN').
+        t = t.join(df_rtn[[i]],how='left',rsuffix='_RTN')
         t.columns = ["FACTOR","VALUE","RTN"]
         t = t.sort_values("VALUE")
         idxs = trench_array(len(t),gps1)
