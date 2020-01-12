@@ -76,3 +76,15 @@ def inx_col_intersec(df1_neu,df_close_loading):
     df1_neu = df1_neu.loc[bingji]
     df_close_loading = df_close_loading.loc[bingji]
     return df1_neu,df_close_loading
+
+
+def add_col(df_fac,df_value):
+    add_dates = set(df_fac.columns) - set(df_value.columns)
+    for ad in add_dates:
+        df_value[ad] = np.nan
+    df_value = df_value.T.sort_index().T
+    return df_value.fillna(method = 'ffill',axis=1)
+
+
+
+
