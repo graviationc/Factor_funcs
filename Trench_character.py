@@ -3,6 +3,7 @@
 
 from Base_pkgs import *
 
+
 def trench_array(list_num, num_gps):
     NumStks1 = int(list_num / num_gps)
     yushu1 = list_num % num_gps
@@ -11,7 +12,14 @@ def trench_array(list_num, num_gps):
     x = [0] + x
     return np.array(x).cumsum()
 
+
 def quantile_character_value(df_fac,df_value,group_number,w_plot):
+    col_drop = df_fac.count()[df_fac.count()<group_number].index
+    if len(col_drop)>0:
+        print(len(col_drop))
+        df_fac = df_fac.drop(col_drop,axis=1)
+    df_fac,df_value = inx_col_intersec(df_fac,df_value)
+
     re3 = []
     re5 = []
     for i in df_fac.columns:
@@ -35,18 +43,20 @@ def quantile_character_value(df_fac,df_value,group_number,w_plot):
     if w_plot==1:
         x = pd.DataFrame(re3).mean()
         plt.grid(linestyle="-.",axis='y',zorder=0)
-        plt.bar(list(np.array(list(x.index))+1),x,zorder=3)
         if x.min()>0:
-            plt.ylim(x.min()*0.99,x.max()*1.01)
-        if x.max()<0:
-            plt.ylim(x.min()*1.01,x.max()*0.99)
+            plt.ylim(x.min()*0.9,x.max()*1.01)
         else:
-            plt.ylim(x.min()*1.01,x.max()*1.01)
+            if x.max()<0:
+                plt.ylim(x.min()*1.01,x.max()*0.99)
+            else:
+                plt.ylim(x.min()*1.01,x.max()*1.01)
+
+        plt.bar(list(np.array(list(x.index))+1),x,zorder=3)
         ax1=plt.gca()
         for j in ['left','right','top']:
-            ax1.spines[j].set_visible(False) 
+            ax1.spines[j].set_visible(False)
         plt.show()
-    return pd.DataFrame(re3).mean()#,pd.DataFrame(re5).sum()
+    return pd.DataFrame(re3).mean(),pd.DataFrame(re5).sum()
     
 def quantile_portfolio(df_fac,df_close,df_value,gps1,gps2,intv,w_plot):
     col_drop = df_fac.count()[df_fac.count()<group_number].index
