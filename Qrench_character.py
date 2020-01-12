@@ -54,16 +54,16 @@ def quantile_character_value(df_fac,df_value,group_number,w_plot):
         plt.show()
     return pd.DataFrame(re3).mean(),pd.DataFrame(re5).sum()
     
-def quantile_portfolio(df_fac,df_close,df_value,gps1,gps2,intv1,intv2,w_plot):
+def quantile_portfolio(df_fac,df_rtn,df_value,gps1,gps2,intv,w_plot,dot_or_add):
     df_fac = date_strp_col(df_fac)
-    df_close = date_strp_col(df_close)
+    df_rtn = date_strp_col(df_rtn)
     df_value = date_strp_col(df_value)
-    df_rtn = df_close.pct_change(intv1,axis=1).shift(-intv1,axis=1).copy(deep=True)
+ 
     df_rtn = add_col(df_fac,df_rtn)
     df_value = add_col(df_fac,df_value)
 
     re3 = []
-    for i in df_fac.columns[::intv2]:
+    for i in df_fac.columns[::intv]:
         t = df_fac[[i]].join(df_value[[i]],how='left',rsuffix='_VALUE').copy(deep=True)
         t = t.join(df_rtn[[i]],how='left',rsuffix='_RTN')
         t = t.dropna()
@@ -87,11 +87,27 @@ def quantile_portfolio(df_fac,df_close,df_value,gps1,gps2,intv1,intv2,w_plot):
                 re2.append(re1)
             re3.append(re2)
 
-    df_mul = pd.DataFrame(np.ones((gps1,gps2)))
-    for j in re3:
-        df_mul = (pd.DataFrame(j)+1).multiply(df_mul)
+    if dot_or_add=='dot':
+        df_mul = pd.DataFrame(np.ones((gps1,gps2)))
+        for j in re3:
+            df_mul = (pd.DataFrame(j)+1).multiply(df_mul)
+    else:
+        df_mul = pd.DataFrame(np.zeros((gps1,gps2)))
+        c = 0
+        for j in re3:
+            c+=1
+            df_mul += pd.DataFrame(j)
+        df_mul = df_mul/c
+
+    df_mul.columns = [j+1 for j in df_mul.columns]
+    df_mul.index = [j+1 for j in df_mul.index]
+
     if w_plot==1:
         df_mul.plot.bar(figsize=(5*gps1,5))
+        plt.grid(linestyle="-.",axis='y')
+        ax1=plt.gca()
+        for j in ['left','right','top']:
+            ax1.spines[j].set_visible(False)
 
     return df_mul
 

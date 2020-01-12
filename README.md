@@ -9,7 +9,7 @@
 
 ## Qrench_character.py
 - quantile_character_value(df_fac,df_value,group_number,w_plot)
-- quantile_portfolio(df_fac,df_close,df_value,gp_num_1,gp_num_2,w_plot)
+- quantile_portfolio(df_fac,df_rtn,df_value,gps1,gps2,intv,w_plot,dot_or_add)
 
 ## Base_pkgs.py
 
