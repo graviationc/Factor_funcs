@@ -103,11 +103,20 @@ def quantile_portfolio(df_fac,df_rtn,df_value,gps1,gps2,intv,w_plot,dot_or_add):
     df_mul.index = [j+1 for j in df_mul.index]
 
     if w_plot==1:
+
         df_mul.plot.bar(figsize=(5*gps1,5))
         plt.grid(linestyle="-.",axis='y')
         ax1=plt.gca()
         for j in ['left','right','top']:
             ax1.spines[j].set_visible(False)
+
+
+        df_mul.T.plot.bar(figsize=(5*gps1,5))
+        plt.grid(linestyle="-.",axis='y')
+        ax1=plt.gca()
+        for j in ['left','right','top']:
+            ax1.spines[j].set_visible(False)
+        plt.show()
 
     return df_mul
 
