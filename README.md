@@ -7,7 +7,7 @@
 - dummy_reg_fast(df1,df_nature_sec)
 - factor_quantile_test(df_fac,df_close,df_weight=0,group_number=20,w_plot=1,w_plot_2=0,intv=20)
 
-## Trench_character.py
+## Qrench_character.py
 - quantile_character_value(df_fac,df_value,group_number,w_plot)
 - quantile_portfolio(df_fac,df_close,df_value,gp_num_1,gp_num_2,w_plot)
 
@@ -20,6 +20,7 @@
 - time_value
 - scale_df()
 - inx_col_intersec(df,df_clos)
+- add_col(df_fac,df_value)
 
 
 ## funcs_history.py
