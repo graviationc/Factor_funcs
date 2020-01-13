@@ -281,6 +281,9 @@ def neu_reg_fast(df1,df_nature_sec,df_mkt_size):
     return dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
 
 def value_reg_fast(df1,df_mkt_size):
+
+    df_mkt_size = add_col(df1,df_mkt_size)
+
     df1,df_mkt_size = inx_col_intersec(df1,df_mkt_size)
     df1 = scale_df(df1)
     df_mkt_size = df_mkt_size.clip(lower=df_mkt_size.quantile(0.01), upper=df_mkt_size.quantile(0.99), axis=1)
