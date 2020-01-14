@@ -58,7 +58,7 @@ def list_to_color(listx):
 
 
 def time_value():
-    return time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())
+    return time.strftime("%Y_%m_%d", time.localtime())#_%H:%M:%S
 
 
 def scale_df(df1):
