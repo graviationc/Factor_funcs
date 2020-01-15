@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
-
+from base_funcs import *
 
 def quantile_character_value(df_fac,df_value,group_number,w_plot):
     df_fac = date_strp_col(df_fac)
