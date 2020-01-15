@@ -5,12 +5,13 @@ from trench_funcs import *
 class factor():
     def __init__(self,factor_name,df_factor,df_close,group_number,intv):
 
+        '''
         col_drop = df_factor.count()[df_factor.count()<group_number].index
         if len(col_drop)>0:
             print("Warning: ",len(col_drop)," columns don't have enough data")
             df_factor = df_factor.drop(col_drop,axis=1)
-
-        #df_factor = add_col(df_close,df_factor)
+        '''
+        df_factor = add_col(df_close,df_factor)
 
         self.factor_value,self.close_loading = inx_col_intersec(df_factor,df_close)
         self.group_number = group_number
@@ -25,11 +26,21 @@ class factor():
     def ffill(self):
         self.factor_value = self.factor_value.fillna(method='ffill',axis=1)
 
-    def out_put_ic(self):
+    def print_ic(self):
         if len(self.ic_result)>0:
             return pd.DataFrame(self.ic_result,index=['Rank IC','Rank ICIR','PCT1','IC','ICIR','PCT2']).T
         else:
             return None
+
+    def print_qtile_rtn(self):
+        idx_ = ['LS RTN',"LS MaxDD"] + ['TOP'] + ['G{0}'.format(num + 2) for num in range(self.group_number - 2)] + ['BOTTOM']
+
+        if len(self.return_groups)>0:
+            return pd.DataFrame(self.return_groups,index=idx_).T
+        else:
+            return None
+
+
 
     def mining_corr(self,weather_plot):
         spr_corr_all_stocks = []
@@ -56,8 +67,8 @@ class factor():
         self.ic_result = corr_analysis(df_ic[["rank ic"]].values.flatten()) + corr_analysis(df_ic[["ic"]].values.flatten())
 
         if weather_plot == True:
-            plt.figure(figsize=(12,8))
-            ax = plt.subplot(221)
+            plt.figure(figsize=(40,4))
+            ax = plt.subplot(141)
 
             xdate, ydata = df_factor_clip.count().index,df_factor_clip.count().values
             xlims = mdate.date2num([xdate[0], xdate[-1]])
@@ -69,17 +80,17 @@ class factor():
             ax.spines['top'].set_visible(False) 
             ax.spines['right'].set_visible(False)
 
-            ax11 = plt.subplot(222)
+            ax11 = plt.subplot(142)
             ax11.set_prop_cycle(cycler('color', ['r', 'g', 'b']))
             dftemp = df_factor_clip.describe().T.iloc[:,[1,3,7]]
             ax11.plot(dftemp)
             ax11.legend(dftemp.columns, loc=2)
 
-            plt.subplot(223)
+            plt.subplot(143)
             hist_ = [i for i in list(df_factor_clip.values.flatten()) if str(i)!="nan"]
             plt.hist(hist_,bins=30)
 
-            plt.subplot(224)
+            plt.subplot(144)
             plt.bar(df_ic.index,df_ic['rank ic'],color=list_to_color(df_ic['rank ic'].values),width=6,alpha=0.5,label='rank ic') #,width=12
             plt.plot(df_ic.index,df_ic['rolling rank ic'],linewidth=4,label='rolling rank ic',c="b")
 
@@ -129,31 +140,42 @@ class factor():
         df_all = pd.DataFrame()
         for j in range(self.trade_interval)[::2]:
             quantile_return_list = [[] for x in range(len(group_name_list))]
+
+
+            col_all = []
             for trade_day_num in range(j,len(order_days)-self.trade_interval,self.trade_interval):
                 trade_day = order_days[trade_day_num]
                 next_trade_day_list = order_days[trade_day_num:trade_day_num+self.trade_interval+1]
+
                 df_concat = pd.DataFrame()
                 df_concat['factor_value'] = self.factor_value[trade_day].copy(deep=True)
                 df_concat.dropna(inplace=True)
 
-                df_concat = df_concat.join(self.close_loading[next_trade_day_list].pct_change(axis=1).iloc[:,1:],how='left').copy(deep=True)
-                df_concat = df_concat.join(df_weight[next_trade_day_list[0]],how='left',rsuffix="weight").copy(deep=True)
-                df_concat = df_concat.replace(np.nan,0)
+                if len(df_concat)>self.group_number:
 
-                df_concat.sort_values(by='factor_value', ascending=True,inplace=True) # top 组合因子值小，bottom组合因子值大
-                idxs = trench_array(len(df_concat), self.group_number)
+                    col_all += order_days[trade_day_num+1:trade_day_num+1+self.trade_interval]
 
-                for iGroup in range(len(group_name_list)):
-                    start_index = idxs[iGroup]
-                    end_index = idxs[iGroup+1]
-                    wei = [[i]*self.trade_interval for i in df_concat.iloc[start_index:end_index,-1].values]
-                    v1 = df_concat.iloc[start_index:end_index,1:-1].copy(deep=True)
-                    quantile_return_list[iGroup] += list(np.average(v1,weights=wei,axis=0))
+                    df_concat = df_concat.join(self.close_loading[next_trade_day_list].pct_change(axis=1).iloc[:,1:],how='left').copy(deep=True)
+                    df_concat = df_concat.join(df_weight[next_trade_day_list[0]],how='left',rsuffix="weight").copy(deep=True)
+                    df_concat = df_concat.replace(np.nan,0)
+
+                    df_concat.sort_values(by='factor_value', ascending=True,inplace=True) # top 组合因子值小，bottom组合因子值大
+                    idxs = trench_array(len(df_concat), self.group_number)
+
+                    for iGroup in range(len(group_name_list)):
+                        start_index = idxs[iGroup]
+                        end_index = idxs[iGroup+1]
+                        wei = [[i]*self.trade_interval for i in df_concat.iloc[start_index:end_index,-1].values]
+                        v1 = df_concat.iloc[start_index:end_index,1:-1].copy(deep=True)
+
+                        #quantile_return_list[iGroup] += list(np.average(v1,weights=wei,axis=0))
+                        quantile_return_list[iGroup] += list(v1.mean().values)
                     
-            df_qtile_rtn = pd.DataFrame(quantile_return_list, index=group_name_list,columns=order_days[j+1:trade_day_num+self.trade_interval+1]).T
-            df_all = df_all.append(df_qtile_rtn)
+            df_qtile_rtn = pd.DataFrame(quantile_return_list, index=group_name_list,columns=col_all).T # order_days[j+1:trade_day_num+self.trade_interval+1]
+            df_all = df_all.append(df_qtile_rtn).copy(deep=True)
 
         df_all = df_all.reset_index()
+
         df_all = df_all.groupby(df_all.columns[0]).mean()
         df_all = df_all.sort_index()
         self.quantile_rtn = df_all
@@ -162,6 +184,8 @@ class factor():
     def neu_reg(self,df_nature_sec,df_mkt_size):
 
         df1 = self.factor_value.copy(deep=True)
+
+        df_mkt_size = add_col(df1,df_mkt_size).fillna(method='ffill',axis=1)
 
         df1,df_mkt_size = inx_col_intersec(df1,df_mkt_size)
         df_nature_sec = df_nature_sec.dropna()
@@ -179,6 +203,7 @@ class factor():
             tmp = pd.get_dummies(df_nature_sec[i])
             df_nature_dummy = df_nature_dummy.join(tmp,how='left')
         df1 = scale_df(df1)
+
         reall1,reall2,reall3=[],[],[]
         for i in range(len(df1.columns)):
             col_ = df1.columns[i]
@@ -203,7 +228,11 @@ class factor():
         allv = np.array([reall1,reall2,reall3]).T
         dfre = pd.DataFrame(allv,columns=["v","index","DATE"])
 
-        self.factor_value = dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
+        df_resid = dfre.pivot(index='index', columns='DATE', values='v').apply(pd.to_numeric)
+
+        self.factor_value = add_col(self.factor_value,df_resid)
+
+         
 
     def value_reg(self,df_mkt_size):
 
@@ -316,6 +345,7 @@ class factor():
             df_ls["ls"] = df_ls.mean(axis=1)
             df_ls_ = (df_ls+1).cumprod().copy(deep=True) 
             ls_re.append(df_ls_["ls"].values)
+
         ls_value = ls_re[0]
 
         index_j = np.argmax(np.maximum.accumulate(ls_value) - ls_value)
@@ -340,6 +370,7 @@ class factor():
             ax=plt.gca()
             ax.spines['top'].set_visible(False) 
             ax.spines['right'].set_visible(False)
+
             ax22 = plt.subplot(142)
             ax22.spines['top'].set_visible(False)
             ax33 = ax22.twinx()

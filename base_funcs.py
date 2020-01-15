@@ -29,6 +29,33 @@ import random
 warnings.filterwarnings("ignore")
 
 
+'''
+import statsmodels.api as sm
+fm = FamaMacBeth(dependent = dfall['RTN_1D'],exog = sm.add_constant(dfall[['MKT_SIZE']]))
+
+res_fm = fm.fit()
+res_fm
+'''
+
+
+# jupyter lab short cuts
+"""
+{
+  "shortcuts": [
+    {
+      "command": "runmenu:restart-and-run-all",
+      "keys": [
+        "`","`"
+      ],
+      "selector": "[data-jp-code-runner]"
+    }
+  ]
+}
+"""
+
+
+
+
 def date_strp_col(df):
     df.columns = [pd.to_datetime(str(i)) for i in df.columns.values]
     df = df.T.sort_index().T
@@ -84,6 +111,9 @@ def inx_col_intersec(df1_neu,df_close_loading):
     return df1_neu,df_close_loading
 
 
+
+
+
 def add_col(df_fac,df_value):
     df_fac = date_strp_col(df_fac)
     df_value = date_strp_col(df_value)
@@ -92,7 +122,7 @@ def add_col(df_fac,df_value):
     for ad in add_dates:
         df_value[ad] = np.nan
     df_value = df_value.T.sort_index().T
-    return df_value.fillna(method = 'ffill',axis=1)
+    return df_value
 
 def factors_corr(df_list,w_plot):
     df_id = ["df" + str(i) for i in range(1,len(df_list)+1)]
