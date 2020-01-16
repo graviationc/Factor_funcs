@@ -112,10 +112,10 @@ class factor():
             df_icall = pd.DataFrame()
             if med=="pearson":
                 df_fac = df_fac.clip(lower=df_fac.quantile(0.05), upper=df_fac.quantile(0.95), axis=1)
-            for j in range(0,250,5):
+            for j in range(0,251,5):
                 x = self.trade_interval + j
                 df_rtn = self.close_loading.pct_change(self.trade_interval ,axis=1).shift(-x,axis=1).copy(deep=True)
-                df_icall[j] = df_fac.iloc[:,::2].corrwith(df_rtn.iloc[:,::2],method=med)
+                df_icall[j] = df_fac.corrwith(df_rtn,method=med)
             if med == "spearman":
                 df["Rank IC"] = df_icall.mean()
             if med == "pearson":
@@ -124,6 +124,7 @@ class factor():
         if signal_plot==True:
             plt.plot(df["Rank IC"],label="Rank IC",color='r')
             plt.plot(df["IC"],label="IC",color='g')
+            plt.grid()
             plt.show()
         return df
 
