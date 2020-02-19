@@ -10,19 +10,19 @@
 | 6    |         |                         |                 |      |                                                              |
 |      |         |                         |                 |      |                                                              |
 
-##Deﬁnition
+## Deﬁnition
 
-####BAB
+#### BAB
 
 Beta
 
-####CMH
+#### CMH
 
 trading volume
 
-####ETP
+#### ETP
 
-$\int\limits_{1}^{\infty}f(x) dx-\int\limits_{-\infty}^{-1}f(x) dx$
+$$\int\limits_{1}^{\infty}f(x) dx-\int\limits_{-\infty}^{-1}f(x) dx$$
 
 use daily residuals $\varepsilon_{i,d}$ from month t to t - 11 as x:
 
