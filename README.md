@@ -10,7 +10,7 @@ trading volume
 
 ## [ETP](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2660598) Excess Tail Probability
 
-$$\int\limits_{1}^{\infty}f(x) dx-\int\limits_{-\infty}^{-1}f(x) dx$$
+$$ \int\limits_{1}^{\infty}f(x) dx-\int\limits_{-\infty}^{-1}f(x) dx   $$
 
 use daily residuals $\varepsilon_{i,d}$ from month t to t - 11 as x:
 
