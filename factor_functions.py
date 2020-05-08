@@ -2,6 +2,10 @@ from base_funcs import *
 
 from trench_funcs import *
 
+
+def annual_sharp(x,rf):
+    return (np.mean(x) - rf/252)/np.std(x)*np.sqrt(252)
+
 class factor():
     def __init__(self,factor_name,df_factor,df_close,group_number,intv):
 
@@ -22,6 +26,7 @@ class factor():
         self.ic_result = []
         self.quantile_rtn = pd.DataFrame()
         self.return_groups = []
+        self.ls_re = []
 
     def ffill(self):
         self.factor_value = self.factor_value.fillna(method='ffill',axis=1)
@@ -347,11 +352,14 @@ class factor():
             df_ls_ = (df_ls+1).cumprod().copy(deep=True) 
             ls_re.append(df_ls_["ls"].values)
 
+        self.ls_re = ls_re.copy()
+
         ls_value = ls_re[0]
 
-        index_j = np.argmax(np.maximum.accumulate(ls_value) - ls_value)
-        index_i = np.argmax(ls_value[:index_j])      
-        maxdd =  1 - ls_value[index_i]/ls_value[index_j]  # 最大回撤
+        index_i = np.argmax((np.maximum.accumulate(ls_value) - ls_value)/np.maximum.accumulate(ls_value))
+
+        index_j = np.argmax(ls_value[:index_i])
+        maxdd =  1 - ls_value[index_i]/ls_value[index_j]
 
         t1 = pd.to_datetime(allq.index.values[0])
         t2 = pd.to_datetime(allq.index.values[-1])
